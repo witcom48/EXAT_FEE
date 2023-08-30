@@ -1,0 +1,28 @@
+<p-dialog header="{{langs.get('login')[selectlang]}}" [(visible)]="displayManage" [style]="{width: '30vw'}"
+    [draggable]="false" [closable]="false">
+    <div class="loginform">
+       
+        <label>{{langs.get('username')[selectlang]}}</label>
+        <input type="text" pInputText [(ngModel)]="user" />
+        <label>{{langs.get('password')[selectlang]}}</label>
+        <p-password [(ngModel)]="pass" [feedback]="false" [toggleMask]="true"></p-password>
+        <button pButton type="button" label="{{langs.get('login')[selectlang]}}" icon="pi pi-lock"
+            (click)="doLogin()"></button>
+        <div class="lang">
+            <p [ngClass]="(selectlang=='TH')?'color':''" (click)="changelang('TH')">TH</p>
+            <p> | </p>
+            <p [ngClass]="(selectlang=='EN')?'color':''" (click)="changelang('EN')">EN</p>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog header="{{langs.get('login')[selectlang]}}" [(visible)]="displaygroupManage"
+    [style]="{width: '30vw'}" [draggable]="false" [closable]="false">
+    <div class="loginform">
+        <label>{{langs.get('username')[selectlang]}}</label>
+        <!-- <p-dropdown appendTo="body" class="selectyaer" [options]="account_list.worker_data" [(ngModel)]="selectaccount"
+            (onChange)="selectcom()" optionLabel="worker_code"></p-dropdown> -->
+        <button pButton type="button" label="{{langs.get('login')[selectlang]}}" icon="pi pi-lock"
+            (click)="selectuser()"></button>
+    </div>
+</p-dialog>

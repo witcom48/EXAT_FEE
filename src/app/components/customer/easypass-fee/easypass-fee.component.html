@@ -1,0 +1,195 @@
+
+<h3><b>{{title_page[language]}}</b></h3>
+
+
+{{tmp}}
+<small>version 1.0</small>
+<p>
+<div class="grid">
+    <div class="col-12">
+        <h4 ><b>{{title_search_condition[language]}}</b></h4>    
+    </div>
+    <div class="col-12 md:col-2">
+        <span style="font-size: 15px;"><u>{{title_status[language]}}</u></span>
+    </div>
+    <div class="col-12 md:col-10">
+        <div class="inputvalue">
+              
+            <input type="radio" name="someperiod" value="W" [(ngModel)]="fill_status" (change)="doGetData()">
+            <label>{{title_status_wait[language]}}</label>
+            &nbsp;&nbsp;
+            <input type="radio" name="someperiod" value="F" [(ngModel)]="fill_status" (change)="doGetData()">
+            <label>{{title_status_success[language]}}</label>           
+            <!-- &nbsp;&nbsp;
+            <input type="radio" name="someperiod" value="A" [(ngModel)]="fill_status" (change)="doGetData()">
+            <label>{{title_status_all[language]}}</label> -->
+        </div>
+    </div>
+    <br>
+    <div class="col-12 md:col-2">
+        <span style="font-size: 15px;"><u>{{title_date[language]}}</u></span>
+    </div>
+    <div class="col-12 md:col-10">
+        <div class="formgrid grid">
+            <!-- <div class="col-12 md:col-2">
+                {{title_date_from[language]}}
+            </div> -->
+            <div class="col-fixed" style="width:200px; margin-left: 20px;">
+                <p-calendar [(ngModel)]="fill_fromdate" dateFormat="dd/mm/yy" inputId="fromdate" [showIcon]="true" appendTo="body" (onSelect)="reloadFee()"></p-calendar>
+            </div>
+            <div class="col-fixed" style="width:30px">
+                -
+            </div>
+            <div class="col-fixed" style="width:200px">
+                <p-calendar [(ngModel)]="fill_todate"  dateFormat="dd/mm/yy" inputId="fromdate" [showIcon]="true" appendTo="body" (onSelect)="reloadFee()"></p-calendar>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12" *ngIf="loading==true">
+        <p-progressBar mode="indeterminate" [style]="{ height: '6px' }"></p-progressBar>
+    </div>    
+
+    <div class="col-12">
+        <p-table  #dtFee [value]="fee_list" styleClass="p-datatable-sm"
+            [tableStyle]="{'min-width': '30rem'}" 
+            selectionMode="single" [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,20,30,40,50]" [(selection)]="seletedFee" (onRowSelect)="onRowSelectFee($event)"
+            [paginator]="true" currentPageReportTemplate="{{title_page_from[language]}} {first} {{title_page_to[language]}} {last} {{title_page_total[language]}} {totalRecords} {{title_page_record[language]}}" 
+            
+            [globalFilterFields]="['fee_date','fee_doc','smartcard_id','fname','lname']"
+            
+            >
+            <ng-template pTemplate="caption">
+                <div class="flex">
+                    <span class="p-input-icon-left ml-auto">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text"
+                            (input)="dtFee.filterGlobal($any($event).target.value, 'contains')"
+                            placeholder="{{title_search[language]}}" />
+                    </span>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="header">
+                <tr>
+                    <th></th>
+                    <th>{{title_grid_date[language]}}</th>
+                    <th class="col_detail">{{title_grid_doc[language]}}</th>
+                    <th>{{title_grid_smartcard[language]}}</th>
+                    <th class="col_detail">{{title_customer_prefix[language]}}</th>
+                    <th class="col_detail">{{title_customer_firstname[language]}}</th>
+                    <th class="col_detail">{{title_customer_lastname[language]}}</th>
+                    <th>{{title_customer_type[language]}}</th>
+                    <th>{{title_grid_fee[language]}}</th>
+                    <!-- <th>{{title_grid_status[language]}}</th>                     -->
+                    <!-- <th class="col_detail">{{title_modified_by[language]}}</th> -->
+                    <!-- <th class="col_detail">{{title_modified_date[language]}}</th> -->
+                    <th></th> 
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-fee let-i="rowIndex">
+                <tr [pSelectableRow]="fee">    
+                    <td style="text-align: center;">{{i+1}}</td>                 
+                    <td style="text-align: center;">{{fee.fee_date | date:'dd/MM/yyyy'}}</td>
+                    <td style="text-align: center;" class="col_detail">{{fee.fee_doc}}</td>
+                    <td style="text-align: center;">{{fee.smartcard_id}}</td> 
+                    <td class="col_detail">{{(fee.title || "")}}</td> 
+                    <td class="col_detail">{{(fee.fname || "")}}</td> 
+                    <td class="col_detail">{{(fee.lname || "")}}</td> 
+                    <td style="text-align: center;">{{fee.cust_type}}</td> 
+
+                    <td style="text-align: right;">{{fee.fee_amount | number:'1.2-2'}}</td>
+                    <!-- <td style="text-align: center;">{{fee.fee_status}}</td>       -->
+                    <!-- <td class="col_detail">{{fee.modified_by}}</td> -->
+                    <!-- <td class="col_detail">{{fee.modified_date | date:'dd/MM/yyyy HH:mm:ss'}}</td> -->
+                    <td>
+                        <p-button icon="pi pi-search" (click)="doShowFeeDetail(fee.fee_doc)" label="" styleClass="p-button-text"></p-button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+<!--  -->
+
+<p-toast position="top-right"></p-toast>
+<p-confirmDialog [style]="{width: '30vw'}" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text" key="myDialog"></p-confirmDialog>
+
+<p-dialog header="ขอใบกำกับภาษี (Etax)" [(visible)]="displayManage" styleClass="dialog-overflow" [style]="{width: '50vw'}" [position]="position" >
+    <p-scrollPanel [style]="{width: '98%', height: '500px'}" >
+        <div class="formgrid grid" >
+            <!-- <div class="field col-12">
+                <label for="ppos_code">{{title_grid_date[language]}}</label>    
+                <input type="text" id="ppos_code"  class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full" >
+            </div> -->
+            <div class="field col-12 md:col-6">
+                <p-panel header="{{title_customer[language]}}" >
+                    <div class="formgrid grid" >
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_customer_name[language]}}</span>
+                            <span class="spn_value">{{(seletedFee.title || "") + seletedFee.fname + ' ' + (seletedFee.lname || "")}}</span>
+                        </div>
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_customer_id[language]}}</span>
+                            <span class="spn_value">{{seletedFee.cust_acct_id}}</span>
+                        </div>
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_customer_tax[language]}}</span>
+                            <span class="spn_value">{{seletedFee.tax_id}}</span>
+                        </div>
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_customer_address[language]}}</span>
+                            <span class="spn_value">{{seletedFee.address}}</span>
+                        </div>
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_customer_email[language]}}</span>
+                            <span class="spn_value">{{seletedFee.email}}</span>
+                        </div>
+                    </div>   
+                </p-panel>
+
+            </div>
+            
+            <div class="field col-12 md:col-6">
+                <p-panel header="{{title_fee[language]}}" >
+                    <div class="formgrid grid" >
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_fee_doc[language]}}</span>
+                            <span class="spn_value">{{seletedFee.fee_doc}}</span>
+                        </div>
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_fee_date[language]}}</span>
+                            <span class="spn_value">{{seletedFee.fee_date | date:'dd/MM/yyyy'}}</span>
+                        </div>
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_smartcard_id[language]}}</span>
+                            <span class="spn_value">{{seletedFee.smartcard_id}}</span>
+                        </div>
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_fee_amount[language]}}</span>
+                            <span class="spn_value">{{seletedFee.fee_amount | number:'1.2-2'}}</span>
+                        </div>
+                        <div class="field col-12">
+                            <span class="spn_title">{{title_fee_status[language]}}</span>
+                            <span class="spn_status"> - </span>
+                            <p>&nbsp;</p>
+                        </div>
+                    </div>
+                </p-panel>
+            </div>
+                       
+            <div class="field col-12" *ngIf="progress==false">
+                <p-button label="{{title_send_etax[language]}}" icon="pi pi-check" (click)="doGenarateEtax()"></p-button>
+                &nbsp;
+                <p-button label="{{title_close[language]}}" icon="pi pi-times" styleClass="p-button-secondary" [style]="{ 'margin-left': '.5em' }" (click)="doCloseDetail()"></p-button>
+            </div>
+
+            <div class="field col-12" *ngIf="progress==true">
+                <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="8" fill="var(--surface-ground)" animationDuration=".9s"></p-progressSpinner>
+            </div>
+        </div>
+
+    </p-scrollPanel>
+</p-dialog>
+
+
+
